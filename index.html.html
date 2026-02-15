@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Purchase Monitoring Dashboard</title>
+    <title>Tableau de bord - Surveillance des achats</title>
+    <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -32,6 +33,8 @@
             margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 1px solid #e1e5eb;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .header-left h1 {
@@ -49,6 +52,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            flex-wrap: wrap;
         }
 
         .search-box {
@@ -96,7 +100,7 @@
             background-color: #2980b9;
         }
 
-        /* Stats Cards - Updated for 4 cards in one row */
+        /* Stats Cards */
         .stats-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -215,6 +219,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 1000px;
         }
 
         th {
@@ -440,12 +445,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .modal-content {
@@ -603,10 +604,6 @@
         }
 
         /* Filter Modal */
-        .filter-modal {
-            display: none;
-        }
-
         .filter-options {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -712,13 +709,15 @@
             }
             
             .header-right {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
+                width: 100%;
+            }
+            
+            .search-box {
+                width: 100%;
             }
             
             .search-box input {
-                width: 200px;
+                width: 100%;
             }
             
             .filter-options {
@@ -731,6 +730,16 @@
             
             .btn-secondary, .btn-primary {
                 width: 100%;
+            }
+            
+            .this-month {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .month-orders {
+                text-align: center;
             }
         }
     </style>
@@ -754,9 +763,8 @@
             </div>
         </header>
 
-        <!-- Stats Cards - Now 4 cards in one row -->
+        <!-- Stats Cards -->
         <div class="stats-container">
-            <!-- Card 1: Total Volume -->
             <div class="stat-card stat-1">
                 <div class="stat-icon">
                     <i class="fas fa-dollar-sign"></i>
@@ -766,12 +774,11 @@
                     <div class="stat-value" id="totalVolume">€46,550.17</div>
                     <div class="stat-change positive">
                         <i class="fas fa-arrow-up"></i>
-                        ≈ +15.2% vs last month
+                        +15.2% vs last month
                     </div>
                 </div>
             </div>
             
-            <!-- Card 2: Received % -->
             <div class="stat-card stat-2">
                 <div class="stat-icon">
                     <i class="fas fa-check-circle"></i>
@@ -781,12 +788,11 @@
                     <div class="stat-value" id="receivedPercent">100%</div>
                     <div class="stat-change positive">
                         <i class="fas fa-arrow-up"></i>
-                        ≈ +8.2% completion rate
+                        +8.2% completion rate
                     </div>
                 </div>
             </div>
             
-            <!-- Card 3: Unpaid -->
             <div class="stat-card stat-3">
                 <div class="stat-icon">
                     <i class="fas fa-credit-card"></i>
@@ -796,12 +802,11 @@
                     <div class="stat-value" id="unpaidAmount">€46,550.17</div>
                     <div class="stat-change negative">
                         <i class="fas fa-arrow-up"></i>
-                        ≈ +100% vs last month
+                        +100% vs last month
                     </div>
                 </div>
             </div>
             
-            <!-- Card 4: Active Suppliers -->
             <div class="stat-card stat-4">
                 <div class="stat-icon">
                     <i class="fas fa-users"></i>
@@ -842,9 +847,7 @@
                                 <th>ACTIONS</th>
                             </tr>
                         </thead>
-                        <tbody id="purchasesTableBody">
-                            <!-- Rows will be populated by JavaScript -->
-                        </tbody>
+                        <tbody id="purchasesTableBody"></tbody>
                     </table>
                 </div>
             </section>
@@ -898,9 +901,7 @@
                 
                 <div class="suppliers-section">
                     <div class="suppliers-title">Suppliers</div>
-                    <ul class="suppliers-list" id="suppliersList">
-                        <!-- Supplier items will be populated by JavaScript -->
-                    </ul>
+                    <ul class="suppliers-list" id="suppliersList"></ul>
                 </div>
             </section>
         </div>
@@ -1009,7 +1010,6 @@
                     <label for="receiptReference">Select Purchase Order</label>
                     <select id="receiptReference" required>
                         <option value="">Select a purchase order</option>
-                        <!-- Options will be populated by JavaScript -->
                     </select>
                 </div>
                 
@@ -1040,7 +1040,7 @@
     </div>
 
     <!-- Modal for Filter by Status -->
-    <div class="modal filter-modal" id="filterModal">
+    <div class="modal" id="filterModal">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">Filter by Status</div>
@@ -1089,9 +1089,7 @@
                 <button class="close-modal" id="closeViewEditModal">&times;</button>
             </div>
             
-            <div id="viewContent">
-                <!-- View content will be populated by JavaScript -->
-            </div>
+            <div id="viewContent"></div>
             
             <form id="editForm" style="display: none;">
                 <div class="form-group">
@@ -1184,7 +1182,7 @@
     </div>
 
     <script>
-        // Data from the second image (Achats Facturés)
+        // Purchase orders data
         let purchaseOrders = [
             {
                 date: "08/07/2025 11:01:00",
@@ -1324,11 +1322,29 @@
             paymentStatus: ['En attente de paiement', 'Payé', 'Partiellement payé', 'En retard']
         };
 
-        // Current action for confirmation dialog
         let currentAction = null;
-        let currentActionData = null;
 
-        // Calculate statistics from the data
+        // Utility Functions
+        function formatDate(dateString) {
+            const datePart = dateString.split(' ')[0];
+            const [day, month, year] = datePart.split('/');
+            const date = new Date(`${year}-${month}-${day}`);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatCurrency(amount) {
+            return `€${amount.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
+        function getStatusClass(status) {
+            if (status === "Reçu" || status === "Received" || status === "Payé") return "status-received";
+            if (status === "En attente" || status === "Pending" || status === "En attente de paiement") return "status-pending";
+            if (status === "Partiel" || status === "Partial" || status === "Partiellement payé") return "status-partial";
+            if (status === "En retard" || status === "Overdue") return "status-overdue";
+            return "status-pending";
+        }
+
+        // Calculate statistics
         function calculateStatistics() {
             let totalVolume = 0;
             let unpaidAmount = 0;
@@ -1343,105 +1359,47 @@
                 totalVolume += order.total;
                 unpaidAmount += order.balance;
                 
-                // Count payment status
-                if (order.paymentStatus === "En attente de paiement") {
-                    pendingPaymentCount++;
-                } else if (order.paymentStatus === "Payé") {
-                    paidCount++;
-                } else if (order.paymentStatus === "Partiellement payé") {
-                    partialPaymentCount++;
-                } else if (order.paymentStatus === "En retard") {
-                    overdueCount++;
-                }
+                if (order.paymentStatus === "En attente de paiement") pendingPaymentCount++;
+                else if (order.paymentStatus === "Payé") paidCount++;
+                else if (order.paymentStatus === "Partiellement payé") partialPaymentCount++;
+                else if (order.paymentStatus === "En retard") overdueCount++;
                 
-                // Count suppliers
-                if (!supplierCounts[order.supplier]) {
-                    supplierCounts[order.supplier] = 0;
-                }
-                supplierCounts[order.supplier]++;
-                
-                // Add to unique suppliers set
+                supplierCounts[order.supplier] = (supplierCounts[order.supplier] || 0) + 1;
                 uniqueSuppliers.add(order.supplier);
             });
             
-            // Calculate received percentage (all orders are "Reçu" in this data)
             const totalOrders = purchaseOrders.length;
             const receivedOrders = purchaseOrders.filter(order => order.receiptStatus === "Reçu").length;
             const receivedPercent = totalOrders > 0 ? (receivedOrders / totalOrders * 100) : 0;
             
-            // Count active suppliers
-            const activeSuppliers = uniqueSuppliers.size;
-            
-            // Update stats cards
-            document.getElementById('totalVolume').textContent = `€${totalVolume.toLocaleString('fr-FR', {minimumFractionDigits: 2})}`;
-            document.getElementById('unpaidAmount').textContent = `€${unpaidAmount.toLocaleString('fr-FR', {minimumFractionDigits: 2})}`;
+            document.getElementById('totalVolume').textContent = formatCurrency(totalVolume);
+            document.getElementById('unpaidAmount').textContent = formatCurrency(unpaidAmount);
             document.getElementById('receivedPercent').textContent = `${receivedPercent.toFixed(1)}%`;
-            document.getElementById('activeSuppliers').textContent = activeSuppliers;
+            document.getElementById('activeSuppliers').textContent = uniqueSuppliers.size;
             
-            // Update filter counts
             document.getElementById('pendingPaymentCount').textContent = pendingPaymentCount;
             document.getElementById('paidCount').textContent = paidCount;
             document.getElementById('partialPaymentCount').textContent = partialPaymentCount;
             document.getElementById('overdueCount').textContent = overdueCount;
             
-            // Update month section
-            document.getElementById('monthAmount').textContent = `€${totalVolume.toLocaleString('fr-FR', {minimumFractionDigits: 2})}`;
+            document.getElementById('monthAmount').textContent = formatCurrency(totalVolume);
             document.getElementById('monthOrders').textContent = purchaseOrders.length;
             
-            return {
-                totalVolume,
-                unpaidAmount,
-                receivedPercent,
-                activeSuppliers,
-                pendingPaymentCount,
-                paidCount,
-                partialPaymentCount,
-                overdueCount,
-                supplierCounts
-            };
+            return { supplierCounts };
         }
 
-        // Format date from "dd/mm/yyyy" to "Mon DD, YYYY"
-        function formatDate(dateString) {
-            const datePart = dateString.split(' ')[0];
-            const [day, month, year] = datePart.split('/');
-            const date = new Date(`${year}-${month}-${day}`);
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        }
-
-        // Format currency
-        function formatCurrency(amount) {
-            return `€${amount.toLocaleString('fr-FR', {minimumFractionDigits: 2})}`;
-        }
-
-        // Get status badge class
-        function getStatusClass(status) {
-            if (status === "Reçu" || status === "Received") return "status-received";
-            if (status === "En attente" || status === "Pending") return "status-pending";
-            if (status === "Partiel" || status === "Partial") return "status-partial";
-            if (status === "En retard" || status === "Overdue") return "status-overdue";
-            if (status === "En attente de paiement") return "status-pending";
-            if (status === "Payé") return "status-received";
-            if (status === "Partiellement payé") return "status-partial";
-            return "status-pending";
-        }
-
-        // Render table rows with filters
+        // Render table rows
         function renderTableRows() {
             const tableBody = document.getElementById('purchasesTableBody');
             tableBody.innerHTML = '';
             
-            // Filter orders
             const filteredOrders = purchaseOrders.filter(order => {
-                const matchesReceiptStatus = activeFilters.receiptStatus.includes(order.receiptStatus);
-                const matchesPaymentStatus = activeFilters.paymentStatus.includes(order.paymentStatus);
-                return matchesReceiptStatus && matchesPaymentStatus;
+                return activeFilters.receiptStatus.includes(order.receiptStatus) && 
+                       activeFilters.paymentStatus.includes(order.paymentStatus);
             });
             
             filteredOrders.forEach(order => {
                 const row = document.createElement('tr');
-                
-                // Check if order is overdue (balance > 0 and date is in the past)
                 const orderDate = new Date(order.date.split(' ')[0].split('/').reverse().join('-'));
                 const isOverdue = order.balance > 0 && orderDate < new Date();
                 
@@ -1473,11 +1431,9 @@
                         </button>
                     </td>
                 `;
-                
                 tableBody.appendChild(row);
             });
             
-            // Add event listeners to action buttons
             attachActionListeners();
         }
 
@@ -1489,69 +1445,52 @@
             for (const [supplier, count] of Object.entries(supplierCounts)) {
                 const li = document.createElement('li');
                 li.className = 'supplier-item';
-                li.innerHTML = `
-                    <span>${supplier}:</span>
-                    <span class="supplier-count">${count} pending</span>
-                `;
+                li.innerHTML = `<span>${supplier}:</span><span class="supplier-count">${count} pending</span>`;
                 suppliersList.appendChild(li);
             }
         }
 
-        // Attach event listeners to action buttons
+        // Attach action listeners
         function attachActionListeners() {
-            // View buttons
             document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const ref = this.getAttribute('data-ref');
-                    openViewModal(ref);
-                });
+                btn.addEventListener('click', () => openViewModal(btn.dataset.ref));
             });
             
-            // Edit buttons
             document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const ref = this.getAttribute('data-ref');
-                    openEditModal(ref);
-                });
+                btn.addEventListener('click', () => openEditModal(btn.dataset.ref));
             });
             
-            // Delete buttons
             document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const ref = this.getAttribute('data-ref');
+                btn.addEventListener('click', () => {
                     showConfirmation(
                         'Delete Purchase Order',
-                        `Are you sure you want to delete purchase order ${ref}? This action cannot be undone.`,
-                        () => deleteOrder(ref)
+                        `Are you sure you want to delete purchase order ${btn.dataset.ref}?`,
+                        () => deleteOrder(btn.dataset.ref)
                     );
                 });
             });
             
-            // Receipt buttons
             document.querySelectorAll('.receipt-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const ref = this.getAttribute('data-ref');
+                btn.addEventListener('click', () => {
                     showConfirmation(
                         'Mark as Received',
-                        `Are you sure you want to mark purchase order ${ref} as received and paid?`,
-                        () => markAsReceived(ref)
+                        `Mark purchase order ${btn.dataset.ref} as received and paid?`,
+                        () => markAsReceived(btn.dataset.ref)
                     );
                 });
             });
         }
 
-        // Delete order function
+        // Actions
         function deleteOrder(reference) {
             const index = purchaseOrders.findIndex(order => order.reference === reference);
             if (index > -1) {
                 purchaseOrders.splice(index, 1);
-                renderTableRows();
-                calculateStatistics();
-                showToast(`Purchase order ${reference} deleted successfully`, 'success');
+                refreshDisplay();
+                showToast(`Order ${reference} deleted successfully`);
             }
         }
 
-        // Mark as received function
         function markAsReceived(reference) {
             const order = purchaseOrders.find(order => order.reference === reference);
             if (order) {
@@ -1559,125 +1498,72 @@
                 order.paymentStatus = "Payé";
                 order.paid = order.total;
                 order.balance = 0;
-                renderTableRows();
-                calculateStatistics();
-                showToast(`Purchase order ${reference} marked as received and paid`, 'success');
+                refreshDisplay();
+                showToast(`Order ${reference} marked as received`);
             }
         }
 
-        // Show confirmation dialog
-        function showConfirmation(title, message, confirmCallback) {
-            document.getElementById('confirmationTitle').textContent = title;
-            document.getElementById('confirmationMessage').textContent = message;
-            
-            currentAction = confirmCallback;
-            
-            closeAllModals();
-            document.getElementById('confirmationModal').style.display = 'flex';
-        }
-
-        // Open View Modal
+        // Modal functions
         function openViewModal(reference) {
             const order = purchaseOrders.find(order => order.reference === reference);
             if (!order) return;
             
             const viewContent = document.getElementById('viewContent');
             viewContent.innerHTML = `
-                <div class="detail-row">
-                    <span class="detail-label">Reference:</span>
-                    <span class="detail-value">${order.reference}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Supplier:</span>
-                    <span class="detail-value">${order.supplier}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Order Date:</span>
-                    <span class="detail-value">${formatDate(order.date)}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Client:</span>
-                    <span class="detail-value">${order.client || '-'}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Receipt Status:</span>
-                    <span class="detail-value"><span class="status-badge ${getStatusClass(order.receiptStatus)}">${order.receiptStatus}</span></span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Payment Status:</span>
-                    <span class="detail-value"><span class="status-badge ${getStatusClass(order.paymentStatus)}">${order.paymentStatus}</span></span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Total Amount:</span>
-                    <span class="detail-value">${formatCurrency(order.total)}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Paid Amount:</span>
-                    <span class="detail-value">${formatCurrency(order.paid)}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Balance:</span>
-                    <span class="detail-value">${formatCurrency(order.balance)}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Invoice:</span>
-                    <span class="detail-value">${order.invoice}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Purchase Order:</span>
-                    <span class="detail-value">${order.purchaseOrder}</span>
-                </div>
+                <div class="detail-row"><span class="detail-label">Reference:</span><span class="detail-value">${order.reference}</span></div>
+                <div class="detail-row"><span class="detail-label">Supplier:</span><span class="detail-value">${order.supplier}</span></div>
+                <div class="detail-row"><span class="detail-label">Order Date:</span><span class="detail-value">${formatDate(order.date)}</span></div>
+                <div class="detail-row"><span class="detail-label">Client:</span><span class="detail-value">${order.client || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Receipt Status:</span><span class="detail-value"><span class="status-badge ${getStatusClass(order.receiptStatus)}">${order.receiptStatus}</span></span></div>
+                <div class="detail-row"><span class="detail-label">Payment Status:</span><span class="detail-value"><span class="status-badge ${getStatusClass(order.paymentStatus)}">${order.paymentStatus}</span></span></div>
+                <div class="detail-row"><span class="detail-label">Total Amount:</span><span class="detail-value">${formatCurrency(order.total)}</span></div>
+                <div class="detail-row"><span class="detail-label">Paid Amount:</span><span class="detail-value">${formatCurrency(order.paid)}</span></div>
+                <div class="detail-row"><span class="detail-label">Balance:</span><span class="detail-value">${formatCurrency(order.balance)}</span></div>
             `;
             
-            // Store current reference for editing
             document.getElementById('viewEditModal').dataset.reference = reference;
-            
-            // Show view mode
             document.getElementById('viewContent').style.display = 'block';
             document.getElementById('editForm').style.display = 'none';
             document.getElementById('viewActions').style.display = 'flex';
             document.getElementById('viewEditTitle').textContent = 'View Purchase Order';
             
-            // Open modal
             closeAllModals();
             document.getElementById('viewEditModal').style.display = 'flex';
         }
 
-        // Open Edit Modal
         function openEditModal(reference) {
             const order = purchaseOrders.find(order => order.reference === reference);
             if (!order) return;
             
-            // Convert date to YYYY-MM-DD format
-            const datePart = order.date.split(' ')[0];
-            const [day, month, year] = datePart.split('/');
-            const formattedDate = `${year}-${month}-${day}`;
+            const [day, month, year] = order.date.split(' ')[0].split('/');
             
-            // Fill form fields
             document.getElementById('editReference').value = order.reference;
             document.getElementById('editSupplier').value = order.supplier;
-            document.getElementById('editOrderDate').value = formattedDate;
+            document.getElementById('editOrderDate').value = `${year}-${month}-${day}`;
             document.getElementById('editClient').value = order.client || '';
             document.getElementById('editTotal').value = order.total;
             document.getElementById('editPaid').value = order.paid;
             document.getElementById('editReceiptStatus').value = order.receiptStatus;
             document.getElementById('editPaymentStatus').value = order.paymentStatus;
             
-            // Store current reference
             document.getElementById('viewEditModal').dataset.reference = reference;
-            
-            // Show edit mode
             document.getElementById('viewContent').style.display = 'none';
             document.getElementById('editForm').style.display = 'block';
             document.getElementById('viewActions').style.display = 'none';
             document.getElementById('viewEditTitle').textContent = 'Edit Purchase Order';
             
-            // Open modal
             closeAllModals();
             document.getElementById('viewEditModal').style.display = 'flex';
         }
 
-        // Show toast notification
+        function showConfirmation(title, message, callback) {
+            document.getElementById('confirmationTitle').textContent = title;
+            document.getElementById('confirmationMessage').textContent = message;
+            currentAction = callback;
+            closeAllModals();
+            document.getElementById('confirmationModal').style.display = 'flex';
+        }
+
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
@@ -1685,65 +1571,54 @@
             toastMessage.textContent = message;
             toast.className = 'toast';
             
-            // Set type
             if (type === 'error') {
                 toast.classList.add('error');
                 toast.querySelector('i').className = 'fas fa-exclamation-circle';
-            } else if (type === 'warning') {
-                toast.classList.add('warning');
-                toast.querySelector('i').className = 'fas fa-exclamation-triangle';
-            } else if (type === 'info') {
-                toast.classList.add('info');
-                toast.querySelector('i').className = 'fas fa-info-circle';
             } else {
                 toast.querySelector('i').className = 'fas fa-check-circle';
             }
             
             toast.classList.add('show');
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // Initialize modals
-        const modals = {
-            newOrder: document.getElementById('newOrderModal'),
-            recordReceipt: document.getElementById('recordReceiptModal'),
-            filter: document.getElementById('filterModal'),
-            viewEdit: document.getElementById('viewEditModal'),
-            confirmation: document.getElementById('confirmationModal')
-        };
+        function refreshDisplay() {
+            const stats = calculateStatistics();
+            renderTableRows();
+            renderSuppliersList(stats.supplierCounts);
+        }
 
-        // Close all modals
         function closeAllModals() {
-            Object.values(modals).forEach(modal => {
+            document.querySelectorAll('.modal').forEach(modal => {
                 modal.style.display = 'none';
             });
         }
 
-        // Modal functionality for new order - FIXED
-        const newOrderBtn = document.getElementById('newOrderBtn');
-        const newOrderForm = document.getElementById('purchaseOrderForm');
-        
-        newOrderBtn.addEventListener('click', () => {
-            closeAllModals();
-            modals.newOrder.style.display = 'flex';
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshDisplay();
             
-            // Set today's date as default
+            // Set today's date
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('orderDate').value = today;
-        });
-        
-        // Quick Actions - FIXED
-        document.getElementById('createPurchaseOrderAction').addEventListener('click', () => {
-            newOrderBtn.click(); // This will open the new order modal
-        });
-        
-        document.getElementById('recordReceiptAction').addEventListener('click', () => {
-            closeAllModals();
+            document.getElementById('receiptDate').value = today;
             
-            // Populate purchase order dropdown
+            // Update reference number
+            const lastRef = Math.max(...purchaseOrders.map(o => parseInt(o.reference.split('/')[1])));
+            document.getElementById('reference').value = `2025/${(lastRef + 1).toString().padStart(4, '0')}`;
+        });
+
+        // New Order
+        document.getElementById('newOrderBtn').addEventListener('click', () => {
+            closeAllModals();
+            document.getElementById('newOrderModal').style.display = 'flex';
+        });
+
+        document.getElementById('createPurchaseOrderAction').addEventListener('click', () => {
+            document.getElementById('newOrderBtn').click();
+        });
+
+        document.getElementById('recordReceiptAction').addEventListener('click', () => {
             const select = document.getElementById('receiptReference');
             select.innerHTML = '<option value="">Select a purchase order</option>';
             purchaseOrders.forEach(order => {
@@ -1753,17 +1628,11 @@
                 select.appendChild(option);
             });
             
-            // Set today's date
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('receiptDate').value = today;
-            
-            modals.recordReceipt.style.display = 'flex';
-        });
-        
-        document.getElementById('filterByStatusAction').addEventListener('click', () => {
             closeAllModals();
-            
-            // Set checkboxes based on active filters
+            document.getElementById('recordReceiptModal').style.display = 'flex';
+        });
+
+        document.getElementById('filterByStatusAction').addEventListener('click', () => {
             document.getElementById('filterReceived').checked = activeFilters.receiptStatus.includes('Reçu');
             document.getElementById('filterPending').checked = activeFilters.receiptStatus.includes('En attente');
             document.getElementById('filterPartial').checked = activeFilters.receiptStatus.includes('Partiel');
@@ -1771,182 +1640,81 @@
             document.getElementById('filterPendingPayment').checked = activeFilters.paymentStatus.includes('En attente de paiement');
             document.getElementById('filterPaid').checked = activeFilters.paymentStatus.includes('Payé');
             
-            modals.filter.style.display = 'flex';
+            closeAllModals();
+            document.getElementById('filterModal').style.display = 'flex';
         });
-        
-        // Close modals
-        document.querySelectorAll('.close-modal').forEach(btn => {
+
+        // Close modal buttons
+        document.querySelectorAll('.close-modal, .btn-secondary').forEach(btn => {
             btn.addEventListener('click', closeAllModals);
         });
-        
-        document.getElementById('cancelNewOrderBtn').addEventListener('click', closeAllModals);
-        document.getElementById('cancelReceiptBtn').addEventListener('click', closeAllModals);
-        document.getElementById('closeViewBtn').addEventListener('click', closeAllModals);
-        document.getElementById('cancelEditBtn').addEventListener('click', () => {
-            const reference = document.getElementById('viewEditModal').dataset.reference;
-            openViewModal(reference);
-        });
-        document.getElementById('cancelConfirmBtn').addEventListener('click', closeAllModals);
-        
-        // Close modal when clicking outside
-        window.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                closeAllModals();
-            }
-        });
-        
-        // New order form submission
-        newOrderForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+
+        // Apply filters
+        document.getElementById('applyFiltersBtn').addEventListener('click', () => {
+            activeFilters.receiptStatus = [];
+            activeFilters.paymentStatus = [];
             
-            // Get form values
-            const reference = document.getElementById('reference').value;
-            const supplier = document.getElementById('supplier').value;
-            const orderDate = document.getElementById('orderDate').value;
-            const client = document.getElementById('client').value;
-            const amount = parseFloat(document.getElementById('amount').value);
-            const paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
-            const receiptStatus = document.getElementById('receiptStatus').value;
-            const paymentStatus = document.getElementById('paymentStatus').value;
-            const description = document.getElementById('description').value;
+            if (document.getElementById('filterReceived').checked) activeFilters.receiptStatus.push('Reçu');
+            if (document.getElementById('filterPending').checked) activeFilters.receiptStatus.push('En attente');
+            if (document.getElementById('filterPartial').checked) activeFilters.receiptStatus.push('Partiel');
+            if (document.getElementById('filterOverdue').checked) activeFilters.paymentStatus.push('En retard');
+            if (document.getElementById('filterPendingPayment').checked) activeFilters.paymentStatus.push('En attente de paiement');
+            if (document.getElementById('filterPaid').checked) activeFilters.paymentStatus.push('Payé');
             
-            if (!supplier || !orderDate || !amount) {
-                showToast('Please fill in all required fields', 'error');
+            if (activeFilters.receiptStatus.length === 0 && activeFilters.paymentStatus.length === 0) {
+                showToast('Select at least one filter', 'warning');
                 return;
             }
             
-            // Format date
-            const formattedDate = new Date(orderDate).toLocaleDateString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            }) + " 09:00:00";
+            renderTableRows();
+            closeAllModals();
+            showToast('Filters applied');
+        });
+
+        document.getElementById('clearFiltersBtn').addEventListener('click', () => {
+            document.querySelectorAll('.filter-option input').forEach(cb => cb.checked = false);
+        });
+
+        // Form submissions
+        document.getElementById('purchaseOrderForm').addEventListener('submit', (e) => {
+            e.preventDefault();
             
-            // Create new order
             const newOrder = {
-                date: formattedDate,
-                reference: reference,
-                supplier: supplier,
-                client: client,
-                receiptStatus: receiptStatus,
-                total: amount,
-                paid: paidAmount,
-                balance: amount - paidAmount,
-                paymentStatus: paymentStatus,
+                date: new Date(document.getElementById('orderDate').value).toLocaleDateString('fr-FR') + " 09:00:00",
+                reference: document.getElementById('reference').value,
+                supplier: document.getElementById('supplier').value,
+                client: document.getElementById('client').value,
+                receiptStatus: document.getElementById('receiptStatus').value,
+                total: parseFloat(document.getElementById('amount').value),
+                paid: parseFloat(document.getElementById('paidAmount').value),
+                balance: parseFloat(document.getElementById('amount').value) - parseFloat(document.getElementById('paidAmount').value),
+                paymentStatus: document.getElementById('paymentStatus').value,
                 invoice: "Aucune",
-                purchaseOrder: "Aucune",
-                description: description
+                purchaseOrder: "Aucune"
             };
             
-            // Add to beginning of array
             purchaseOrders.unshift(newOrder);
-            
-            // Update UI
-            renderTableRows();
-            const stats = calculateStatistics();
-            renderSuppliersList(stats.supplierCounts);
-            
-            // Close modal and reset form
+            refreshDisplay();
             closeAllModals();
-            
-            // Update reference number for next order
-            const currentRef = parseInt(reference.split('/')[1]);
-            const nextRef = `2025/${(currentRef + 1).toString().padStart(4, '0')}`;
-            document.getElementById('reference').value = nextRef;
-            
-            // Show success message
-            showToast(`New purchase order ${reference} created successfully`, 'success');
+            showToast(`Order ${newOrder.reference} created`);
         });
-        
-        // Record receipt form submission
+
         document.getElementById('receiptForm').addEventListener('submit', (e) => {
             e.preventDefault();
             
             const reference = document.getElementById('receiptReference').value;
-            const receiptDate = document.getElementById('receiptDate').value;
-            const receiptStatus = document.getElementById('receiptStatusSelect').value;
-            const notes = document.getElementById('receiptNotes').value;
-            
-            if (!reference) {
-                showToast('Please select a purchase order', 'error');
-                return;
-            }
-            
             const order = purchaseOrders.find(order => order.reference === reference);
+            
             if (order) {
-                // Convert date to dd/mm/yyyy format
-                const [year, month, day] = receiptDate.split('-');
-                const formattedDate = `${day}/${month}/${year} 09:00:00`;
-                
-                order.date = formattedDate;
-                order.receiptStatus = receiptStatus;
-                
-                if (notes) {
-                    order.notes = notes;
-                }
-                
-                renderTableRows();
-                calculateStatistics();
+                const [year, month, day] = document.getElementById('receiptDate').value.split('-');
+                order.date = `${day}/${month}/${year} 09:00:00`;
+                order.receiptStatus = document.getElementById('receiptStatusSelect').value;
+                refreshDisplay();
                 closeAllModals();
-                showToast(`Receipt recorded for ${reference}`, 'success');
+                showToast(`Receipt recorded for ${reference}`);
             }
         });
-        
-        // Clear all filters
-        document.getElementById('clearFiltersBtn').addEventListener('click', () => {
-            document.querySelectorAll('.filter-option input[type="checkbox"]').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-        });
-        
-        // Apply filters
-        document.getElementById('applyFiltersBtn').addEventListener('click', () => {
-            // Get selected filters
-            const selectedReceiptStatus = [];
-            const selectedPaymentStatus = [];
-            
-            if (document.getElementById('filterReceived').checked) {
-                selectedReceiptStatus.push('Reçu');
-            }
-            if (document.getElementById('filterPending').checked) {
-                selectedReceiptStatus.push('En attente');
-            }
-            if (document.getElementById('filterPartial').checked) {
-                selectedReceiptStatus.push('Partiel');
-            }
-            if (document.getElementById('filterOverdue').checked) {
-                selectedPaymentStatus.push('En retard');
-            }
-            if (document.getElementById('filterPendingPayment').checked) {
-                selectedPaymentStatus.push('En attente de paiement');
-            }
-            if (document.getElementById('filterPaid').checked) {
-                selectedPaymentStatus.push('Payé');
-            }
-            
-            // Check if at least one filter is selected
-            if (selectedReceiptStatus.length === 0 && selectedPaymentStatus.length === 0) {
-                showToast('Please select at least one filter', 'warning');
-                return;
-            }
-            
-            // Update active filters
-            activeFilters.receiptStatus = selectedReceiptStatus;
-            activeFilters.paymentStatus = selectedPaymentStatus;
-            
-            // Re-render table
-            renderTableRows();
-            closeAllModals();
-            showToast('Filters applied successfully', 'success');
-        });
-        
-        // Edit order button
-        document.getElementById('editOrderBtn').addEventListener('click', () => {
-            const reference = document.getElementById('viewEditModal').dataset.reference;
-            openEditModal(reference);
-        });
-        
-        // Edit form submission
+
         document.getElementById('editForm').addEventListener('submit', (e) => {
             e.preventDefault();
             
@@ -1954,15 +1722,8 @@
             const order = purchaseOrders.find(order => order.reference === reference);
             
             if (order) {
-                // Update order
-                const orderDate = new Date(document.getElementById('editOrderDate').value);
-                const formattedDate = orderDate.toLocaleDateString('fr-FR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                }) + " 09:00:00";
-                
-                order.date = formattedDate;
+                const [year, month, day] = document.getElementById('editOrderDate').value.split('-');
+                order.date = `${day}/${month}/${year} 09:00:00`;
                 order.supplier = document.getElementById('editSupplier').value;
                 order.client = document.getElementById('editClient').value;
                 order.total = parseFloat(document.getElementById('editTotal').value);
@@ -1971,47 +1732,37 @@
                 order.receiptStatus = document.getElementById('editReceiptStatus').value;
                 order.paymentStatus = document.getElementById('editPaymentStatus').value;
                 
-                renderTableRows();
-                calculateStatistics();
+                refreshDisplay();
                 closeAllModals();
-                showToast(`Purchase order ${reference} updated successfully`, 'success');
+                showToast(`Order ${reference} updated`);
             }
         });
-        
-        // Confirmation button
+
+        document.getElementById('editOrderBtn').addEventListener('click', () => {
+            openEditModal(document.getElementById('viewEditModal').dataset.reference);
+        });
+
         document.getElementById('confirmBtn').addEventListener('click', () => {
             if (currentAction) {
                 currentAction();
                 closeAllModals();
             }
         });
-        
-        // Search functionality
-        const searchInput = document.getElementById('searchInput');
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#purchasesTableBody tr');
-            
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
+
+        // Search
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('#purchasesTableBody tr').forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
             });
         });
 
-        // Initialize the dashboard
-        function initDashboard() {
-            const stats = calculateStatistics();
-            renderTableRows();
-            renderSuppliersList(stats.supplierCounts);
-            
-            // Set today's date in the form for new orders
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('orderDate').value = today;
-            document.getElementById('receiptDate').value = today;
-        }
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initDashboard);
+        // Click outside modal
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                closeAllModals();
+            }
+        });
     </script>
 </body>
 </html>
